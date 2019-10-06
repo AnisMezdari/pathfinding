@@ -12,7 +12,9 @@ public:
 	int height;
 	float widthSquare;
 	float heightSquare;
+	std::list<Square> SquareDistance;
 	std::list< std::list<Square>> tabSquare;
+
 	//Square tabSquare[1][1];
 	Terrain(int width, int height,float widthSquare, float heightSquare);
 

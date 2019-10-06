@@ -7,8 +7,9 @@ public:
 	float positionX;
 	float positionY;
 	bool obstacle;
+	float poid;
 
 	Square();
-	Square(float width , float height, bool obstacle);
+	Square(float width, float height, bool obstacle, float poid);
 };
 
