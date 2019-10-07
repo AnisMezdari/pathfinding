@@ -78,7 +78,7 @@ std::list<Square> A_star(Square positionInital, Square positionFinal, Terrain te
 			if (it->getDistance(positionInital) + it->getDistance(positionFinal) < min) {
 				min = it->getDistance(positionInital) + it->getDistance(positionFinal);
 				minSquareIt = it;
-				std::cout << it->positionY_square<<"\n";
+				//std::cout << it->positionY_square<<"\n";
 			}
 		}
 
@@ -173,7 +173,7 @@ int main()
 	std::list<Square> shortPath = A_star(*it, *it2, terrain);
 
 	for (std::list<Square> ::iterator it = shortPath.begin(); it != shortPath.end(); ++it) {
-		std::cout << it->positionX << " " << it->positionY << "\n";
+		std::cout << it->positionX_square << " " << it->positionY_square << "\n";
 	}
 
 

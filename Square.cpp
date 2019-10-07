@@ -39,12 +39,13 @@ std::list<Square> Square::getVoisins(Terrain terrain) {
  	std::list<std::list<Square>>::iterator it = std::next(terrain.tabSquare.begin(), this->positionX_square);
 	if ((this->positionY_square + 1 >= terrain.height )== 1) {
 		//std::cout << "\n" << (this->positionY_square + 1);
-		std::list<Square>::iterator it2 = std::next(it->begin(), (this->positionY_square + 1));
-		if (&it2 != NULL) {
-			listSquare.push_front(*it2);
+		for (auto it_n = it->begin(); it_n != it->end(); ++it_n) {
+			//std::cout << it_n->positionX_square << " " << it_n->positionY_square << "\n";
 		}
+		//std::cout << (this->positionY_square + 1);
+		std::list<Square>::iterator it2 = std::next(it->begin(), (this->positionY_square + 1));
+		listSquare.push_front(*it2);
 	}
-	
 	
 	std::list<std::list<Square>>::iterator it_1 = std::next(terrain.tabSquare.begin(), this->positionX_square);
 	if (!(this->positionY_square - 1 < 0)) {
