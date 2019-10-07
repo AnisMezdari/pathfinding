@@ -9,6 +9,7 @@
 #include "Square.h"
 #include <algorithm>
 #include <limits>
+#include <unordered_map>
 
 std::list< std::list<sf::RectangleShape>> terrainGeneration(Terrain terrain) {
 
@@ -81,39 +82,41 @@ std::list<Square> A_star(Square positionInital, Square positionFinal, Terrain te
 				//std::cout << it->positionY_square<<"\n";
 			}
 		}
-
+		
 		//Remove from open list
 		Square minSquare = *minSquareIt;
-		openList.erase(minSquareIt);
-
+		
 		//Found the shortest path to the end; exit
 		if (minSquare == positionFinal) {
-			return shortPath;
+			break;
 		}
-
+		openList.erase(minSquareIt);
 		//add to closed list
 		closeList.push_front(minSquare);
-		
-
-		
+				
 		std::list<Square> voisin = minSquare.getVoisins(terrain);
+		std::unordered_map<Square, Square> map;
 
-		
 		for (auto it2 = voisin.begin(); it2 != voisin.end(); ++it2) {
+		
 			
+
+
 			bool inOpenList = std::find(openList.begin(), openList.end(), *it2) != openList.end();
 			bool inCloseList = std::find(closeList.begin(), closeList.end(), *it2) != closeList.end();
-			
-			if (!inOpenList && !inCloseList && !it2->obstacle) {
+			std::cout << it2->positionX_square << "," << it2->positionY_square << "\n";
+			std::cout << "openList " << inOpenList << "   closeList " << inCloseList << "\n";
+			if (!inOpenList && !inCloseList) {
+				
 				openList.push_front(*it2);
 				shortPath.push_front(minSquare);
 			}
 		}
-	}
 
+		std::cout << "\n\n\n";
+	}
 	return shortPath;
 	
-
 }
 
 int main()
@@ -168,14 +171,17 @@ int main()
 	//terrain.tabSquare.
 
 	std::list<Square>::iterator it = std::next(terrain.SquareDistance.begin(), 0);
-	std::list<Square>::iterator it2 = std::next(terrain.SquareDistance.begin(), 15);
+	std::list<Square>::iterator it2 = std::next(terrain.SquareDistance.begin(), 24);
 	
 	std::list<Square> shortPath = A_star(*it, *it2, terrain);
 
-	for (std::list<Square> ::iterator it = shortPath.begin(); it != shortPath.end(); ++it) {
-		std::cout << it->positionX_square << " " << it->positionY_square << "\n";
+	for (std::list<Square> ::iterator it3 = shortPath.begin(); it3 != shortPath.end(); ++it3) {
+		//std::cout << it3->positionX_square << " " << it3->positionY_square << "\n";
+		
 	}
-
+	std::cout << "\n\n\n\n";
+	std::cout << "Initial postition : " << it->positionX_square << " " << it->positionY_square << "\n";
+	std::cout << "Final postition : " << it2->positionX_square << " " << it2->positionY_square << "\n";
 
 	// Frame loop
 	int p = 1;

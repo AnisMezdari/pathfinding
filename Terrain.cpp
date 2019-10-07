@@ -6,6 +6,8 @@
 Terrain::Terrain(int width, int height, float widthSquare , float heightSquare ) {
 	srand(time(NULL));
 	
+	this->width = width;
+	this->height = height;
 	for (int i = 0; i < width; i++) {
 		std::list<Square> listSquare_h;
 		for (int j = 0; j < height; j++) {
