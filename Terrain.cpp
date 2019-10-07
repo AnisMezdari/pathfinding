@@ -14,6 +14,7 @@ Terrain::Terrain(int width, int height, float widthSquare , float heightSquare )
 				Square square(widthSquare, heightSquare, true, 100000);
 				square.positionX = 3 + (widthSquare * i);
 				square.positionY = 3 + (heightSquare * j);
+				square.setPositionSquare(widthSquare, heightSquare);
 				listSquare_h.push_back(square);
 				this->SquareDistance.push_back(square);
 			}
@@ -21,6 +22,7 @@ Terrain::Terrain(int width, int height, float widthSquare , float heightSquare )
 				Square square(widthSquare, heightSquare, false,1);
 				square.positionX = 3 + (widthSquare * i);
 				square.positionY = 3 + (heightSquare * j);
+				square.setPositionSquare(widthSquare, heightSquare);
 				listSquare_h.push_back(square);
 				this->SquareDistance.push_back(square);
 			}
