@@ -1,5 +1,8 @@
 #pragma once
 #include <list> 
+
+
+
 class Terrain;
 
 class Square
@@ -27,3 +30,24 @@ public:
 
 bool operator==(const Square& a, const Square& b);
 bool operator!=(const Square& a, const Square& b);
+namespace std {
+
+	template <>
+	struct hash<Square>
+	{
+		std::size_t operator()(const Square& k) const
+		{
+			using std::size_t;
+			using std::hash;
+			using std::string;
+
+			// Compute individual hash values for first,
+			// second and third and combine them using XOR
+			// and bit shifting:
+
+			return ((hash<int>()((int)k.positionX_square)
+				^ (hash<int>()((int)k.positionY_square) << 1)) >> 1);
+		}
+	};
+
+}

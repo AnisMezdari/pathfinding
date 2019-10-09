@@ -37,10 +37,18 @@ std::list< std::list<sf::RectangleShape>> terrainGeneration(Terrain terrain) {
 }
 
 
-sf::CircleShape  CharacterCreation() {
+sf::CircleShape  CharacterCreation(float positionX, float positionY,Terrain terrain, sf::Color color) {
 	sf::CircleShape shape(10.f);
-	shape.setFillColor(sf::Color(70, 130, 180));
-	shape.setPosition(15, 15);
+	shape.setFillColor(color);
+	shape.setPosition(15 + (positionX * terrain.widthSquare), 15 + (positionY * terrain.heightSquare));
+
+	return shape;
+}
+
+sf::CircleShape blackHole(float positionX, float positionY, Terrain terrain) {
+	sf::CircleShape shape(19.f);
+	shape.setFillColor(sf::Color(0,0,0));
+	shape.setPosition(8 + (positionX * terrain.widthSquare), 8 + (positionY * terrain.heightSquare));
 
 	return shape;
 }
@@ -69,7 +77,7 @@ std::list<Square> A_star(Square positionInital, Square positionFinal, Terrain te
 	openList.push_back(positionInital);
 	
 	std::list<Square> shortPath;
-
+	std::unordered_map<Square, Square> preceding;
 	while (!openList.empty())
 	{
 		//Find minimum Square
@@ -82,109 +90,92 @@ std::list<Square> A_star(Square positionInital, Square positionFinal, Terrain te
 				//std::cout << it->positionY_square<<"\n";
 			}
 		}
-		
-		//Remove from open list
 		Square minSquare = *minSquareIt;
-		
 		//Found the shortest path to the end; exit
 		if (minSquare == positionFinal) {
-			break;
+			auto it = preceding.find(minSquare);
+			while (it != preceding.end())
+			{
+				shortPath.push_front(minSquare);
+				minSquare = preceding[minSquare];
+				it = preceding.find(minSquare);
+			}
+
+			//insert the start node in the path
+			shortPath.push_front(minSquare);
+			return shortPath;
 		}
+		//Remove from open list
 		openList.erase(minSquareIt);
 		//add to closed list
 		closeList.push_front(minSquare);
 				
 		std::list<Square> voisin = minSquare.getVoisins(terrain);
-		std::unordered_map<Square, Square> map;
+		//std::unordered_map<Square, Square> map;
 
 		for (auto it2 = voisin.begin(); it2 != voisin.end(); ++it2) {
-		
-			
-
-
 			bool inOpenList = std::find(openList.begin(), openList.end(), *it2) != openList.end();
 			bool inCloseList = std::find(closeList.begin(), closeList.end(), *it2) != closeList.end();
-			std::cout << it2->positionX_square << "," << it2->positionY_square << "\n";
-			std::cout << "openList " << inOpenList << "   closeList " << inCloseList << "\n";
-			if (!inOpenList && !inCloseList) {
-				
+			if (!inOpenList && !inCloseList && !it2->obstacle) {
 				openList.push_front(*it2);
-				shortPath.push_front(minSquare);
+				preceding[*it2] = minSquare;
 			}
 		}
-
-		std::cout << "\n\n\n";
 	}
 	return shortPath;
 	
 }
 
+int randomPostion(bool isPlayer, Terrain terrain) {
+	srand(time(NULL));
+	int randNum = 0;
+	if (isPlayer) {
+		
+		std::list<Square>::iterator it;
+		do {
+			randNum = std::rand() % terrain.height + 1;
+			it = std::next(terrain.SquareDistance.begin(), randNum);
+			
+		} while (it->obstacle);
+	}
+	else {
+		std::list<Square>::iterator it;
+		do {
+			randNum = (std::rand() % (terrain.height-1) + ((terrain.height * terrain.width) - terrain.height));
+			std::cout << randNum;
+			it = std::next(terrain.SquareDistance.begin(), randNum);
+		} while (it->obstacle);
+	}
+
+	return randNum;
+}
+
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(1250, 750), "Jeu vidéo incroyable");
+	sf::RenderWindow window(sf::VideoMode(1250, 850), "Jeu vidéo incroyable");
 
-	const int width = 5;
-	const int height = 5;
+	const int width = 25;
+	const int height = 15;
 	float widthSquare = 50;
 	float heightSquare = 50;
 	Terrain terrain(width, height, widthSquare, heightSquare);
 
 	std::list< std::list<sf::RectangleShape>> listSquareView_2d = terrainGeneration(terrain);
-	sf::CircleShape character = CharacterCreation();
-
-
-	std::list< std::list<int>> matriceSquare;
-
-	/*std::list<Square>::iterator it = terrain.SquareDistance.begin();
-	std::list<Square>::iterator it2 = terrain.SquareDistance.begin();*/
-	/*for ( int i = 0; i < terrain.SquareDistance.size(); i++) {
-		
-		std::list<Square>::iterator it = std::next(terrain.SquareDistance.begin(), i);
-		std::list<int> listDistance;
-		for ( int j = 0; j < terrain.SquareDistance.size(); j++) {
-			
-			std::list<Square>::iterator it2 = std::next(terrain.SquareDistance.begin(), j);
-			
-			if (!(it->positionX  == it2->positionX && it->positionY == it2->positionY)) {
-				int distance = std::abs(it->positionX - it2->positionX) + std::abs(it->positionY - it2->positionY);
-				distance = distance / (int)widthSquare;
-				distance = (int) ((distance / 2) + 1);
-				distance = distance * it2->poid;
-				listDistance.push_back(distance);
-				//std::cout << "  x :" << (int)((it->positionX-3)/50) << " y :" << (int) ((it->positionY-3)/50 )<< " ////  x : " << (int) ((it2->positionX-3)/50) << " y :" << (int) ((it2->positionY-3)/50) << " Distance : " << distance << "\n";
-
-			} 
-			
-		}
-		matriceSquare.push_back(listDistance);
-	}*/
-
-
-	/*for (int i = 0; i < matriceSquare.size(); i++) {
-		std::list< std::list<int>>::iterator it = std::next(matriceSquare.begin(), i);
-		for (int j =  0; j < it->size(); j++) {
-			std::list<int>::iterator it2 = std::next(it->begin(), j);
-			std::cout << " i:" << i << "  j:" << j <<"   distance :" << *it2 << "\n";
-		}
-	}*/
-
-	//terrain.tabSquare.
-
-	std::list<Square>::iterator it = std::next(terrain.SquareDistance.begin(), 0);
-	std::list<Square>::iterator it2 = std::next(terrain.SquareDistance.begin(), 24);
 	
-	std::list<Square> shortPath = A_star(*it, *it2, terrain);
 
-	for (std::list<Square> ::iterator it3 = shortPath.begin(); it3 != shortPath.end(); ++it3) {
-		//std::cout << it3->positionX_square << " " << it3->positionY_square << "\n";
-		
-	}
+	auto  initalPosition = std::next(terrain.SquareDistance.begin(), randomPostion(true,terrain));
+	auto finalPostion = std::next(terrain.SquareDistance.begin(), randomPostion(false,terrain));
+
+
+	sf::CircleShape character = CharacterCreation(finalPostion->positionX_square, finalPostion->positionY_square,terrain, sf::Color(70, 130, 180));
+	sf::CircleShape IA = CharacterCreation(initalPosition->positionX_square,initalPosition->positionY_square,terrain, sf::Color(178, 34, 34));
+	sf::CircleShape blackHole_userInterface = blackHole(1,15,terrain);
+
 	std::cout << "\n\n\n\n";
-	std::cout << "Initial postition : " << it->positionX_square << " " << it->positionY_square << "\n";
-	std::cout << "Final postition : " << it2->positionX_square << " " << it2->positionY_square << "\n";
+	std::cout << "Initial postition : " << initalPosition->positionX_square << " " << initalPosition->positionY_square << "\n";
+	std::cout << "Final postition : " << finalPostion->positionX_square << " " << finalPostion->positionY_square << "\n";
 
 	// Frame loop
-	int p = 1;
 	while (window.isOpen())
 	{
 		sf::Event event;
@@ -194,16 +185,34 @@ int main()
 				window.close();
 		}
 		window.clear(sf::Color(220, 220, 220, 50));
-		for (std::list< std::list<sf::RectangleShape>> ::iterator listSquareView_2d_w = listSquareView_2d.begin(); listSquareView_2d_w != listSquareView_2d.end(); ++listSquareView_2d_w) {
-			for (std::list<sf::RectangleShape>::iterator listSquareView_2d_h = listSquareView_2d_w->begin(); listSquareView_2d_h != listSquareView_2d_w->end(); ++listSquareView_2d_h) {
+		for (auto listSquareView_2d_w = listSquareView_2d.begin(); listSquareView_2d_w != listSquareView_2d.end(); ++listSquareView_2d_w) {
+			for (auto listSquareView_2d_h = listSquareView_2d_w->begin(); listSquareView_2d_h != listSquareView_2d_w->end(); ++listSquareView_2d_h) {
 				window.draw(*listSquareView_2d_h);
 			}
 
 		}
 		window.draw(character);
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-		character.setPosition(15 + (p * 50),15 + (p * 50));
-		p++;
+		window.draw(IA);
+		window.draw(blackHole_userInterface);
+		std::list<Square> shortPath = A_star(*initalPosition, *finalPostion, terrain);
+
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			// left click...
+		}
+		// get global mouse position
+		std::cout << sf::Mouse::getPosition(window).x << " " << sf::Mouse::getPosition(window).y << "\n";
+		// set mouse position relative to a window
+		   
+
+
+
+		auto nextPostion = std::next(shortPath.begin(), 1);
+		if (nextPostion != shortPath.end()) {
+			//std::cout << it3->positionX_square << " " << it3->positionY_square << "\n";
+			IA.setPosition(15 + (nextPostion->positionX_square * terrain.widthSquare), 15 + (nextPostion->positionY_square * terrain.heightSquare));
+			*initalPosition = *nextPostion;
+		}
 		window.display();
 	}
 	
