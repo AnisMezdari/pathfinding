@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include <list> 
 
 
@@ -30,10 +31,10 @@ public:
 
 bool operator==(const Square& a, const Square& b);
 bool operator!=(const Square& a, const Square& b);
-namespace std {
+
 
 	template <>
-	struct hash<Square>
+	struct std::hash<Square>
 	{
 		std::size_t operator()(const Square& k) const
 		{
@@ -50,4 +51,3 @@ namespace std {
 		}
 	};
 
-}

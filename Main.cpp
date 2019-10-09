@@ -203,10 +203,7 @@ int main()
 		// get global mouse position
 		std::cout << sf::Mouse::getPosition(window).x << " " << sf::Mouse::getPosition(window).y << "\n";
 		// set mouse position relative to a window
-		   
-
-
-
+		sf::sleep(sf::seconds(0.5f));
 		auto nextPostion = std::next(shortPath.begin(), 1);
 		if (nextPostion != shortPath.end()) {
 			//std::cout << it3->positionX_square << " " << it3->positionY_square << "\n";
