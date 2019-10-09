@@ -18,13 +18,15 @@ public:
 	int positionY_square;
 	bool obstacle;
 	float poid;
+	bool hasBlackHole;
 
 	Square();
-	Square(float width, float height, bool obstacle, float poid);
+	Square(float width, float height, bool obstacle, float poid, bool hasBlackHole);
 	bool compare(Square otherSquare);
-	std::list<Square> getVoisins(Terrain terrain);
+	std::list<Square> getVoisins(Terrain &terrain);
 	float getDistance(Square otherSquare);
 	void setPositionSquare(int width, int height);
+	void setBlackHole(bool hasBlackHole);
 
 };
 

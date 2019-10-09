@@ -15,7 +15,7 @@ Terrain::Terrain(int width, int height, float widthSquare , float heightSquare )
 		for (int j = 0; j < height; j++) {
 			int randNum = std::rand() % 5 + 1;
 			if (randNum == 5) {
-				Square square(widthSquare, heightSquare, true, 100000);
+				Square square(widthSquare, heightSquare, true, 100000,false);
 				square.positionX = 3 + (widthSquare * i);
 				square.positionY = 3 + (heightSquare * j);
 				square.setPositionSquare(widthSquare, heightSquare);
@@ -23,7 +23,7 @@ Terrain::Terrain(int width, int height, float widthSquare , float heightSquare )
 				this->SquareDistance.push_back(square);
 			}
 			else {
-				Square square(widthSquare, heightSquare, false,1);
+				Square square(widthSquare, heightSquare, false,1,false);
 				square.positionX = 3 + (widthSquare * i);
 				square.positionY = 3 + (heightSquare * j);
 				square.setPositionSquare(widthSquare, heightSquare);

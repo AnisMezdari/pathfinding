@@ -11,7 +11,7 @@
 #include <limits>
 #include <unordered_map>
 
-std::list< std::list<sf::RectangleShape>> terrainGeneration(Terrain terrain) {
+std::list< std::list<sf::RectangleShape>> terrainGeneration(Terrain &terrain) {
 
 	std::list< std::list<sf::RectangleShape>> listSquareView_2d;
 	for (std::list< std::list<Square>> ::iterator widthTerrain = terrain.tabSquare.begin(); widthTerrain != terrain.tabSquare.end(); ++widthTerrain) {
@@ -37,7 +37,7 @@ std::list< std::list<sf::RectangleShape>> terrainGeneration(Terrain terrain) {
 }
 
 
-sf::CircleShape  CharacterCreation(float positionX, float positionY,Terrain terrain, sf::Color color) {
+sf::CircleShape  CharacterCreation(float positionX, float positionY,Terrain &terrain, sf::Color color) {
 	sf::CircleShape shape(10.f);
 	shape.setFillColor(color);
 	shape.setPosition(15 + (positionX * terrain.widthSquare), 15 + (positionY * terrain.heightSquare));
@@ -45,7 +45,7 @@ sf::CircleShape  CharacterCreation(float positionX, float positionY,Terrain terr
 	return shape;
 }
 
-sf::CircleShape blackHole(float positionX, float positionY, Terrain terrain) {
+sf::CircleShape blackHole(float positionX, float positionY, Terrain &terrain) {
 	sf::CircleShape shape(19.f);
 	shape.setFillColor(sf::Color(0,0,0));
 	shape.setPosition(8 + (positionX * terrain.widthSquare), 8 + (positionY * terrain.heightSquare));
@@ -69,7 +69,7 @@ void disjtra(int x, int y, std::list< std::list<int>> matriceSquare) {
 	}*/
 }
 
-std::list<Square> A_star(Square positionInital, Square positionFinal, Terrain terrain) {
+std::list<Square> A_star(Square &positionInital, Square &positionFinal, Terrain &terrain) {
 
 	std::list<Square> openList;
 	std::list<Square> closeList;
@@ -126,7 +126,7 @@ std::list<Square> A_star(Square positionInital, Square positionFinal, Terrain te
 	
 }
 
-int randomPostion(bool isPlayer, Terrain terrain) {
+int randomPostion(bool isPlayer, Terrain &terrain) {
 	srand(time(NULL));
 	int randNum = 0;
 	if (isPlayer) {
@@ -142,13 +142,70 @@ int randomPostion(bool isPlayer, Terrain terrain) {
 		std::list<Square>::iterator it;
 		do {
 			randNum = (std::rand() % (terrain.height-1) + ((terrain.height * terrain.width) - terrain.height));
-			std::cout << randNum;
 			it = std::next(terrain.SquareDistance.begin(), randNum);
 		} while (it->obstacle);
 	}
 
 	return randNum;
 }
+
+
+sf::CircleShape setPositionBlackHoleByMouse(sf::RenderWindow *window, Terrain &terrain) {
+	int x = sf::Mouse::getPosition(*window).x;
+	int y = sf::Mouse::getPosition(*window).y;
+
+	//std::cout << x << " " << y << "\n";
+	int positionX_blackHole = (x / terrain.widthSquare) ;
+	int positionY_blackHole = (y / terrain.heightSquare) ;
+	//std::cout << (positionX_blackHole * terrain.widthSquare)  << " " << positionY_blackHole << "\n";
+
+	return blackHole(positionX_blackHole, positionY_blackHole,terrain);
+
+	//blackHole_->setPosition(positionX_blackHole * terrain.widthSquare, positionY_blackHole * terrain.heightSquare);
+
+}
+
+sf::Sprite displayButton(sf::RenderWindow &window) {
+	sf::Texture texture;
+	if (!texture.loadFromFile("play_button.png"))
+	{
+		// erreur...
+		std::cout << " error";
+	}
+	sf::Sprite sprite;
+	sprite.setTexture(texture);
+	sprite.setScale(0.1, 0.1);
+	sprite.setPosition(5, 15*51);	
+	window.draw(sprite);
+	return sprite;
+}
+
+bool collisionMouseAndButton(int mouseX, int mouseY, int spriteX, int spriteY) {
+	if ((mouseX > spriteX && mouseX < (spriteX + 50)) && (mouseY > spriteY && (spriteY + 50))) {
+		return true;
+	}
+	return false;
+}
+
+
+bool  playSimulation(std::list<Square> &shortPath, Terrain &terrain, sf::CircleShape &IA, int &compteur) {
+
+	auto nextPostion = std::next(shortPath.begin(), compteur);
+
+	if (nextPostion != shortPath.end()) {
+		IA.setPosition(15 + (nextPostion->positionX_square * terrain.widthSquare), 15 + (nextPostion->positionY_square * terrain.heightSquare));
+		std::cout << nextPostion->hasBlackHole << "\n";
+		if (nextPostion->hasBlackHole) {
+			std::cout << "sa passe";
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+	return true;
+}
+
 
 int main()
 {
@@ -166,15 +223,24 @@ int main()
 	auto  initalPosition = std::next(terrain.SquareDistance.begin(), randomPostion(true,terrain));
 	auto finalPostion = std::next(terrain.SquareDistance.begin(), randomPostion(false,terrain));
 
-
+	
 	sf::CircleShape character = CharacterCreation(finalPostion->positionX_square, finalPostion->positionY_square,terrain, sf::Color(70, 130, 180));
 	sf::CircleShape IA = CharacterCreation(initalPosition->positionX_square,initalPosition->positionY_square,terrain, sf::Color(178, 34, 34));
 	sf::CircleShape blackHole_userInterface = blackHole(1,15,terrain);
+	//sf::CircleShape blackHole_ = blackHole(15, 15, terrain);
 
 	std::cout << "\n\n\n\n";
 	std::cout << "Initial postition : " << initalPosition->positionX_square << " " << initalPosition->positionY_square << "\n";
 	std::cout << "Final postition : " << finalPostion->positionX_square << " " << finalPostion->positionY_square << "\n";
-
+	
+	
+	
+	sf::CircleShape blackHole;
+	bool isCliked = false;
+	bool play = false;
+	int compteur = 0;
+	bool setSquare = false;
+	std::list<Square> shortPath;
 	// Frame loop
 	while (window.isOpen())
 	{
@@ -189,28 +255,53 @@ int main()
 			for (auto listSquareView_2d_h = listSquareView_2d_w->begin(); listSquareView_2d_h != listSquareView_2d_w->end(); ++listSquareView_2d_h) {
 				window.draw(*listSquareView_2d_h);
 			}
-
 		}
-		window.draw(character);
-		window.draw(IA);
-		window.draw(blackHole_userInterface);
-		std::list<Square> shortPath = A_star(*initalPosition, *finalPostion, terrain);
 
+		if (!isCliked) {
+			blackHole = setPositionBlackHoleByMouse(&window, terrain);
+		}
+
+		window.draw(blackHole);
+		window.draw(character);
+		sf::Sprite sprite = displayButton(window);
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
 			// left click...
+			isCliked = true;
+			if (!setSquare) {
+				float x =(( blackHole.getPosition().x - 8) / terrain.widthSquare );
+				float y = ((blackHole.getPosition().y - 8) / terrain.heightSquare);
+				
+				for (auto it = terrain.tabSquare.begin(); it != terrain.tabSquare.end(); it++) {
+					for (auto it2 = it->begin(); it2 != it->end(); it2++) {
+						if (it2->positionX_square == x && it2->positionY_square == y) {
+							it2->setBlackHole(true);
+						}
+					}
+				}
+				shortPath = A_star(*initalPosition, *finalPostion, terrain);
+				setSquare = true;
+			}
+
+			if (collisionMouseAndButton(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y, sprite.getPosition().x, sprite.getPosition().y)) {
+				play = true;
+			}
 		}
+	
 		// get global mouse position
-		std::cout << sf::Mouse::getPosition(window).x << " " << sf::Mouse::getPosition(window).y << "\n";
+		//std::cout << sf::Mouse::getPosition(window).x << " " << sf::Mouse::getPosition(window).y << "\n";
 		// set mouse position relative to a window
-		sf::sleep(sf::seconds(0.5f));
-		auto nextPostion = std::next(shortPath.begin(), 1);
-		if (nextPostion != shortPath.end()) {
-			//std::cout << it3->positionX_square << " " << it3->positionY_square << "\n";
-			IA.setPosition(15 + (nextPostion->positionX_square * terrain.widthSquare), 15 + (nextPostion->positionY_square * terrain.heightSquare));
-			*initalPosition = *nextPostion;
+		//sf::sleep(sf::seconds(0.1f));
+		window.draw(IA);
+		if (play) {
+			sf::sleep(sf::seconds(0.2f));
+			play = playSimulation(shortPath, terrain, IA,compteur);
+			compteur++;
 		}
+		
+		
 		window.display();
+		
 	}
 	
 	return 0;

@@ -8,13 +8,14 @@ Square::Square() {
 
 }
 
-Square::Square(float width, float height, bool obstacle, float poid)
+Square::Square(float width, float height, bool obstacle, float poid, bool blackHole)
 {
 	this->width = width;
 	this->height = height;
 	this->obstacle = obstacle;
 	this->poid = poid;
 	this->poid = poid;
+	this->hasBlackHole = blackHole;
 }
 
 
@@ -32,7 +33,7 @@ void Square::setPositionSquare(int width, int height ) {
 }
 
 
-std::list<Square> Square::getVoisins(Terrain terrain) {
+std::list<Square> Square::getVoisins(Terrain &terrain) {
 
 	std::list<Square> listSquare;
  	std::list<std::list<Square>>::iterator it = std::next(terrain.tabSquare.begin(), this->positionX_square);
@@ -95,6 +96,10 @@ std::list<Square> Square::getVoisins(Terrain terrain) {
 	}
 	return listSquare;
 
+}
+
+void Square::setBlackHole(bool hasBlackHole) {
+	this->hasBlackHole = hasBlackHole;
 }
 
 bool operator==(const Square& a, const Square& b)

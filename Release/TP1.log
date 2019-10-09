@@ -1,0 +1,19 @@
+﻿  Main.cpp
+d:\anis\cours\ia\tp1\tp1\main.cpp(130): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
+d:\anis\cours\ia\tp1\tp1\main.cpp(158): warning C4244: 'initialisation' : conversion de 'float' en 'int', perte possible de données
+d:\anis\cours\ia\tp1\tp1\main.cpp(159): warning C4244: 'initialisation' : conversion de 'float' en 'int', perte possible de données
+d:\anis\cours\ia\tp1\tp1\main.cpp(162): warning C4244: 'argument' : conversion de 'int' en 'float', perte possible de données
+d:\anis\cours\ia\tp1\tp1\main.cpp(177): warning C4305: 'argument' : troncation de 'double' à 'float'
+d:\anis\cours\ia\tp1\tp1\main.cpp(227): warning C4244: 'argument' : conversion de 'int' en 'float', perte possible de données
+d:\anis\cours\ia\tp1\tp1\main.cpp(228): warning C4244: 'argument' : conversion de 'int' en 'float', perte possible de données
+d:\anis\cours\ia\tp1\tp1\main.cpp(286): warning C4244: 'argument' : conversion de 'const T' en 'int', perte possible de données
+          with
+          [
+              T=float
+          ]
+  Génération de code en cours
+  100 of 693 functions (14.4%) were compiled, the rest were copied from previous compilation.
+    7 functions were new in current compilation
+    33 functions had inline decision re-evaluated but remain unchanged
+  Fin de la génération du code
+  TP1.vcxproj -> D:\Anis\Cours\IA\TP1\Release\TP1.exe
